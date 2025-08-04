@@ -62,6 +62,11 @@ const CreatorCenter: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleEditorChange = (value: string) => {
+    setFormData(prev => ({ ...prev, content: value }))
+    console.log(value);
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFormData(prev => ({
@@ -168,15 +173,20 @@ const CreatorCenter: React.FC = () => {
                   </span>
                 ))}
               </div>
-
-              <textarea
+              {/* <textarea
                 name='content'
                 value={formData.content}
                 onChange={handleInputChange}
                 placeholder='输入内容（必填）'
                 className={styles.contentInput}
               />
-              {/* <Editor /> */}
+              <Editor /> */}
+              {/* <div className={styles.contentInput}> */}
+                <Editor
+                  value={formData.content}
+                  onChange={handleEditorChange}
+                />
+              {/* </div> */}
               <div className={styles.fileUpload}>
                 <input
                   type='file'
@@ -191,7 +201,7 @@ const CreatorCenter: React.FC = () => {
                   上传文件
                 </label>
               </div>
-
+              
               {formData.files.length > 0 && (
                 <div className={styles.filePreview}>
                   {formData.files.map((file, index) => (

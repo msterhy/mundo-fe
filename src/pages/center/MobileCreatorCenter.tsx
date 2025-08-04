@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import styles from './MobileCreatorCenter.module.css'
 import { fetchTags, post } from '../../router/api'
+import Editor from '@/components/QuillEditor'
 type ContentType = 'qanda' | 'article' | 'team' | 'resource'
 
 interface ContentForm {
@@ -66,6 +67,10 @@ const CreatorCenter: React.FC = () => {
         files: [...prev.files, ...Array.from(e.target.files!)]
       }))
     }
+  }
+  const handleEditorChange = (value: string) => {
+    setFormData(prev => ({ ...prev, content: value }))
+    console.log(value);
   }
 
   const handleTagToggle = (tag: Tag) => {
@@ -156,15 +161,18 @@ const CreatorCenter: React.FC = () => {
             ))}
           </div>
 
-          <textarea
+          {/* <textarea
             name='content'
             value={formData.content}
             onChange={handleInputChange}
             placeholder='输入内容（必填）'
             className={styles.contentInput}
+          /> */}
+          <Editor
+            value={formData.content}
+            onChange={handleEditorChange}
           />
-
-          <div className={styles.fileUpload}>
+          {/* <div className={styles.fileUpload}>
             <input
               type='file'
               accept='image/*'
@@ -177,9 +185,9 @@ const CreatorCenter: React.FC = () => {
               <span className={styles.uploadIcon}>📎</span>
               上传文件
             </label>
-          </div>
+          </div> */}
 
-          {formData.files.length > 0 && (
+          {/* {formData.files.length > 0 && (
             <div className={styles.filePreview}>
               {formData.files.map((file, index) => (
                 <div key={index} className={styles.fileItem}>
@@ -199,7 +207,7 @@ const CreatorCenter: React.FC = () => {
                 </div>
               ))}
             </div>
-          )}
+          )} */}
 
           <button
             className={styles.submitButton}
