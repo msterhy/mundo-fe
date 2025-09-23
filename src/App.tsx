@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react' // ✅ 修改点：添加 useEffect
 import { AuthProvider } from './context/AuthContext'
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
