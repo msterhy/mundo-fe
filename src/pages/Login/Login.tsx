@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import randomatic from 'randomatic'
-import { Message, Alert } from '@arco-design/web-react'
+import { Message, Alert, Spin } from '@arco-design/web-react'
 // import style from "./Login.module.css";
 import style from './Auth.module.css'
 import { useAuth } from '../../context/AuthContext.tsx'
@@ -40,6 +40,7 @@ const Login = () => {
   const emailbind = searchParams.get('email') // 从 URL 获取 email
   const { external, setExternalFunc } = useAuth()
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
   // 使用 useEffect 来确保 URL 中的 external 被同步到 Context 中
   useEffect(() => {
     const urlExternal = searchParams.get('external')
@@ -103,6 +104,7 @@ const Login = () => {
       Message.error('请先勾选同意隐私条款和服务条款')
       return
     }
+    setLoading(true)
     try {
       const data = await loginUser(email, password) // 调用登录函数
       //console.log("登录成功:", data);
@@ -111,8 +113,10 @@ const Login = () => {
       setAuthtokenflag(true)
       refreshLongToken()
       navigate('/qanda')
-    } catch (err) {
+    } catch (err: any) {
       Message.error(err?.response?.data?.message || '登录失败，请稍后重试')
+    } finally {
+      setLoading(false)
     }
   }
   /*
@@ -143,6 +147,7 @@ const Login = () => {
       return
     }
     setPolling(true)
+    setLoading(true)
     setStatus('正在检查登录状态...')
     const id = setInterval(async () => {
       try {
@@ -156,6 +161,7 @@ const Login = () => {
           refreshLongToken()
           navigate('/qanda')
           setPolling(false)
+          setLoading(false)
           if (intervalId) clearInterval(intervalId)
         } else if (result.code === 400) {
           setStatus('等待用户扫码或确认...')
@@ -189,6 +195,7 @@ const Login = () => {
   const startPollingHelper = () => {
     if (polling || !state || !code) return
     setPolling(true)
+    setLoading(true)
     setStatus('正在检查登录状态...')
     if (longtoken && state && code) {
       bindLogin()
@@ -206,6 +213,7 @@ const Login = () => {
           refreshLongToken()
           navigate('/qanda')
           setPolling(false)
+          setLoading(false)
           if (intervalId) clearInterval(intervalId)
         } else if (result.code === 400) {
           setStatus('等待用户鉴权确认...')
@@ -315,6 +323,7 @@ const Login = () => {
 
   const bindLogin = (): Promise<void> => {
     return new Promise((resolve, reject) => {
+      setLoading(true)
       if (!longtoken) {
         handleVerify()
           .then(newtoken => {
@@ -330,6 +339,9 @@ const Login = () => {
             setStatus('激活失败或 longtoken无效，请重新激活')
             console.error(error)
             reject(new Error('激活失败或 longtoken无效，请重新激活'))
+          })
+          .finally(() => {
+            setLoading(false)
           })
       } else {
         handleBindEmail(longtoken as string)
@@ -423,8 +435,15 @@ const Login = () => {
                   <p className={style.errorTip}>请先勾选同意隐私条款和服务条款</p>
                 )}
               </div>
-              <button className={style.primaryButton} onClick={handleLogin}>
-                <span>立即登录</span>
+              <button
+                className={style.primaryButton}
+                onClick={handleLogin}
+                disabled={loading}
+              >
+                {loading && (
+                  <Spin style={{ marginRight: '8px' }} loading={loading} size={20} />
+                )}
+                <span>{loading ? '登录中...' : '立即登录'}</span>
                 <div className={style.buttonHover}></div>
               </button>
 
@@ -432,14 +451,18 @@ const Login = () => {
                 <button
                   className={`${style.socialButton} ${style.wechat}`}
                   onClick={fetchQRCode}
+                  disabled={loading}
                 >
-                  微信登录
+                  {loading && <Spin loading={loading} size={20} />}
+                  {!loading && '微信登录'}
                 </button>
                 <button
                   className={`${style.socialButton} ${style.hdu}`}
                   onClick={handleHelperLogin}
+                  disabled={loading}
                 >
-                  HDU Helper
+                  {loading && <Spin loading={loading} size={20} />}
+                  {!loading && 'HDU Helper'}
                 </button>
               </div>
             </div>
@@ -462,9 +485,16 @@ const Login = () => {
               <div className={style.qrContainer}>
                 <h3>微信扫码登录</h3>
                 <img src={qrCodeUrl} alt='微信登录二维码' />
-                <p className={style.qrStatus}>{status}</p>
+                <p className={style.qrStatus}>
+                  {polling && <Spin style={{ marginRight: '8px' }} />}
+                  {status}
+                </p>
                 {!polling && (
-                  <button className={style.secondaryButton} onClick={startPolling}>
+                  <button
+                    className={style.secondaryButton}
+                    onClick={startPolling}
+                    disabled={loading}
+                  >
                     已扫码，开始验证
                   </button>
                 )}
