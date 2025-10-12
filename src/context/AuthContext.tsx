@@ -56,6 +56,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('role')
     localStorage.removeItem('houtaiLogin')
     localStorage.removeItem('stuffid')
+    setTokenState(null)
+    setEmailState(null)
+    setExternalState(null)
+    setRoleState(null)
   }
 
   return (

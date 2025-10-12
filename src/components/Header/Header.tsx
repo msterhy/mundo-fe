@@ -202,7 +202,6 @@ const Header: React.FC = () => {
           onCancel={() => setVisible(false)}
           onOk={() => {
             setVisible(false)
-            localStorage.setItem('longtoken', '')
             logout()
             navigate('/')
           }}
@@ -231,7 +230,6 @@ const Header: React.FC = () => {
                 type='primary'
                 onClick={() => {
                   setVisible(false)
-                  localStorage.setItem('longtoken', '')
                   logout()
                   navigate('/')
                 }}
