@@ -1,8 +1,12 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import styles from './FrontPage.module.css'
+import { useAuth } from '@/context/AuthContext'
 
 const FrontPage: React.FC = () => {
+  const { longtoken } = useAuth()
+  const navigate = useNavigate()
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -11,15 +15,21 @@ const FrontPage: React.FC = () => {
             <span className={styles.logoText}>MUNDO</span>
           </div>
           <nav className={styles.nav}>
-            <Link to='/login' className={styles.navLink}>
-              登录
-            </Link>
-            <Link to='/register' className={styles.navLink}>
-              注册
-            </Link>
-            <Link to='/qanda' className={styles.navLink}>
-              探索
-            </Link>
+            {!longtoken ? (
+              <>
+                <Link to='/login' className={styles.navLink}>
+                  登录
+                </Link>
+                <Link to='/register' className={styles.navLink}>
+                  注册
+                </Link>
+                <Link to='/qanda' className={styles.navLink}>
+                  探索
+                </Link>
+              </>
+            ) : (
+              <span className={styles.state}>已登录</span>
+            )}
           </nav>
         </div>
       </header>
@@ -39,12 +49,20 @@ const FrontPage: React.FC = () => {
           </p>
 
           <div className={styles.heroActions}>
-            <Link to='/register' className={styles.heroCta}>
-              立即加入
-            </Link>
-            <Link to='/qanda' className={styles.heroSecondaryCta}>
-              先行探索 &rarr;
-            </Link>
+            {!longtoken ? (
+              <>
+                <Link to='/login' className={styles.heroCta}>
+                  立即加入
+                </Link>
+                <Link to='/qanda' className={styles.heroSecondaryCta}>
+                  先行探索 &rarr;
+                </Link>
+              </>
+            ) : (
+              <Link to='/qanda' className={styles.heroCta}>
+                立即探索&rarr;
+              </Link>
+            )}
           </div>
 
           <div className={styles.stats}>
@@ -147,9 +165,11 @@ const FrontPage: React.FC = () => {
             <div className={styles.ctaText}>
               <p>加入MUNDO，与数万名大学生一起，开启你的高效学习之旅</p>
             </div>
-            <Link to='/register' className={styles.ctaButton}>
-              立即注册
-            </Link>
+            {!longtoken && (
+              <Link to='/register' className={styles.ctaButton}>
+                立即注册
+              </Link>
+            )}
           </div>
         </section>
       </main>
